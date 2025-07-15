@@ -1,0 +1,37 @@
+{
+	"name": "run-services",
+	"version": "0.0.0",
+	"license": "MIT",
+	"bin": {
+		"run-services": "./dist/cli.js"
+	},
+	"type": "module",
+	"engines": {
+		"node": ">=18"
+	},
+	"scripts": {
+		"build": "tsc",
+		"start": "tsc --watch",
+		"cli": "npm run build && node dist/cli.js",
+		"test": "vitest"
+	},
+	"files": [
+		"dist"
+	],
+	"dependencies": {
+		"@types/react": "^18.2.21",
+		"execa": "^8.0.1",
+		"ink": "^4.4.1",
+		"ink-big-text": "^2.0.0",
+		"ink-gradient": "^3.0.0",
+		"react": "^18.2.0"
+	},
+	"devDependencies": {
+		"@sindresorhus/tsconfig": "^4.0.0",
+		"@vdemedes/prettier-config": "^2.0.1",
+		"prettier": "^3.0.3",
+		"tsx": "^3.12.8",
+		"typescript": "^5.2.2",
+		"vitest": "^0.34.3"
+	}
+}
