@@ -16,7 +16,7 @@ This CLI application helps me to manage and run multiple React micro-frontend pr
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repo-url>
+    git clone run-services-cli
     cd run-services
     ```
 
