@@ -68,7 +68,7 @@ export default function App({ onConfirm }: AppProps) {
 
 	const renderHeader = () => (
 		<Box flexDirection="column" alignItems="center" marginBottom={1}>
-			<BigText text="CIMB Niaga" font="block" colors={["red", "red"]} />
+			<BigText text="MF Orchestrator" font="tiny" colors={["red", "red"]} />
 			<Text bold color="gray">
 				Run Multiple Repo at Once 🔥🔥🔥🔥🔥
 			</Text>
