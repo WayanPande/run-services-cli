@@ -1,45 +1,67 @@
 #!/usr/bin/env node
-import React from 'react';
-import { render } from 'ink';
-import App from './app.js';
-import { execa } from 'execa';
+import React from "react";
+import { render } from "ink";
+import App from "./app.js";
+import { execa } from "execa";
 
 const main = async () => {
-    const onConfirm = async (selectedRepos: Array<{ label: string; value: string }>) => {
-        const sessionName = 'multi_react_apps';
+	const hasTmux = await execa("which", ["tmux"]).then(
+		() => true,
+		() => false,
+	);
 
-        try {
-            await execa('tmux', ['has-session', '-t', sessionName]);
-            await execa('tmux', ['kill-session', '-t', sessionName]);
-        } catch (error) {
-            // No existing session, safe to ignore
-        }
+	const onConfirm = async (
+		selectedRepos: Array<{ label: string; value: string }>,
+		tool: "tmux" | "concurrently",
+	) => {
+		if (tool === "tmux") {
+			const sessionName = "multi_react_apps";
 
-        await execa('tmux', ['new-session', '-d', '-s', sessionName]);
+			try {
+				await execa("tmux", ["has-session", "-t", sessionName]);
+				await execa("tmux", ["kill-session", "-t", sessionName]);
+			} catch (error) {
+				// No existing session, safe to ignore
+			}
 
-        for (const repo of selectedRepos) {
-            const repoName = repo.label;
-            await execa('tmux', ['new-window', '-t', sessionName, '-n', repoName]);
-            await execa('tmux', [
-                'send-keys',
-                '-t',
-                `${sessionName}:${repoName}`,
-                `cd ${repo.value} && npm start`,
-                'C-m',
-            ]);
-        }
+			await execa("tmux", ["new-session", "-d", "-s", sessionName]);
 
-        unmount();
+			for (const repo of selectedRepos) {
+				const repoName = repo.label;
+				await execa("tmux", ["new-window", "-t", sessionName, "-n", repoName]);
+				await execa("tmux", [
+					"send-keys",
+					"-t",
+					`${sessionName}:${repoName}`,
+					`cd ${repo.value} && npm start`,
+					"C-m",
+				]);
+			}
 
-        try {
-            await execa('tmux', ['attach', '-t', sessionName], { stdio: 'inherit' });
-        } catch (error) {
-            // Ignore error when tmux session is closed
-        }
-    };
+			unmount();
 
-    const { unmount } = render(<App onConfirm={onConfirm} />);
+			try {
+				await execa("tmux", ["attach", "-t", sessionName], {
+					stdio: "inherit",
+				});
+			} catch (error) {
+				// Ignore error when tmux session is closed
+			}
+		} else {
+			const commands = selectedRepos.map(
+				(repo) => `"cd ${repo.value} && npm start"`
+			);
+
+			unmount();
+
+			await execa("npx", ["concurrently", ...commands], {
+				stdio: "inherit",
+				shell: true,
+			});
+		}
+	};
+
+	const { unmount } = render(<App onConfirm={onConfirm} hasTmux={hasTmux} />);
 };
 
 main();
-
